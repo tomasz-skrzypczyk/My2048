@@ -31,22 +31,27 @@ class Game2048(QtWidgets.QWidget):
             512: QtGui.QBrush(QtGui.QColor(0xedc850)),
             1024: QtGui.QBrush(QtGui.QColor(0xedc53f)),
             2048: QtGui.QBrush(QtGui.QColor(0xedc22e)),
+            2048: QtGui.QBrush(QtGui.QColor(0xedffff)),
         }
         self.lightPen = QtGui.QPen(QtGui.QColor(0xf9f6f2))
         self.darkPen = QtGui.QPen(QtGui.QColor(0x776e65))
         self.scoreRect = QtCore.QRect(10, 10, 80, self.panelHeight - 20)
         self.hiScoreRect = QtCore.QRect(100, 10, 80, self.panelHeight - 20)
         self.resetRect = QtCore.QRectF(190, 10, 80, self.panelHeight - 20)
+        self.monteCarloRect = QtCore.QRectF(10, self.gridOffsetY + self.gridSize * (20 + self.tileMargin), 80,
+                                            self.panelHeight - 20)
         self.scoreLabel = QtCore.QRectF(10, 25, 80, self.panelHeight - 30)
         self.hiScoreLabel = QtCore.QRectF(100, 25, 80, self.panelHeight - 30)
         self.hiScore = 0
         self.score = 0
         self.lastPoint = None
-        self.resize(QtCore.QSize(width, width + self.panelHeight))
+        self.resize(QtCore.QSize(width, width + 2 * self.panelHeight))
 
     def resizeEvent(self, e):
         width = min(e.size().width(), e.size().height() - self.panelHeight)
         self.tileSize = (width - self.tileMargin * (self.gridSize + 1)) / self.gridSize
+        self.monteCarloRect = QtCore.QRectF(10, self.gridOffsetY + self.gridSize * (self.tileSize + self.tileMargin),
+                                            80, self.panelHeight - 20)
         self.font = QtGui.QFont('Arial', self.tileSize / 4)
 
     def changeGridSize(self, x):
@@ -125,20 +130,10 @@ class Game2048(QtWidgets.QWidget):
                                               QtWidgets.QMessageBox.Yes,
                                               QtWidgets.QMessageBox.No) == QtWidgets.QMessageBox.Yes:
                 self.reset_game()
-        elif self.gameRunning and self.lastPoint is not None:
-            dx = e.pos().x() - self.lastPoint.x()
-            dy = e.pos().y() - self.lastPoint.y()
-            if abs(dx) > abs(dy) and abs(dx) > 10:
-                if dx > 0:
-                    self.right()
-                else:
-                    self.left()
-            elif abs(dy) > 10:
-                if dy > 0:
-                    self.down()
-                else:
-                    self.up()
-
+        elif self.monteCarloRect.contains(self.lastPoint.x(), self.lastPoint.y()) and self.monteCarloRect.contains(
+                e.pos().x(),
+                e.pos().y()):
+            self.gameController.take_control("monteCarlo")
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
         painter.setPen(QtCore.Qt.NoPen)
@@ -148,6 +143,7 @@ class Game2048(QtWidgets.QWidget):
         painter.drawRoundedRect(self.scoreRect, 10.0, 10.0)
         painter.drawRoundedRect(self.hiScoreRect, 10.0, 10.0)
         painter.drawRoundedRect(self.resetRect, 10.0, 10.0)
+
         painter.setFont(QtGui.QFont('Arial', 9))
         painter.setPen(self.darkPen)
         painter.drawText(QtCore.QRectF(10, 15, 80, 20), 'SCORE',
@@ -157,6 +153,7 @@ class Game2048(QtWidgets.QWidget):
         painter.setFont(QtGui.QFont('Arial', 15))
         painter.setPen(self.lightPen)
         painter.drawText(self.resetRect, 'RESET', QtGui.QTextOption(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter))
+
         painter.setFont(QtGui.QFont('Arial', 15))
         painter.setPen(self.lightPen)
         painter.drawText(self.scoreLabel, str(self.score),
@@ -181,3 +178,9 @@ class Game2048(QtWidgets.QWidget):
                     painter.setPen(self.darkPen if value < 16 else self.lightPen)
                     painter.drawText(rect, str(value),
                                      QtGui.QTextOption(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter))
+        painter.setFont(QtGui.QFont('Arial', 15))
+        painter.setBrush(self.brushes[1])
+        painter.setPen(self.lightPen)
+        painter.drawRoundedRect(self.monteCarloRect, 10.0, 10.0)
+        painter.drawText(self.monteCarloRect, 'Monte Carlo AI',
+                         QtGui.QTextOption(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter))
