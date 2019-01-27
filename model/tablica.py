@@ -1,4 +1,5 @@
 import random
+
 import numpy as np
 
 
@@ -38,21 +39,21 @@ class Tablica:
     def move(self, movement):
         moved = True
         points = 0
-        if movement == 0 and self.plansza != self.nextLeft:
+        if movement == 2 and self.plansza != self.nextLeft:
             self.plansza = self.nextLeft
             points = self.leftPoints
             self.clearPoints()
             # print("lewo")
-        elif movement == 1 and self.plansza != self.nextRight:
+        elif movement == 3 and self.plansza != self.nextRight:
             # print("Prawo")
             self.plansza = self.nextRight
             points = self.rightPoints
             self.clearPoints()
-        elif movement == 2 and self.plansza != self.nextUp:
+        elif movement == 0 and self.plansza != self.nextUp:
             self.plansza = self.nextUp
             points = self.upPoints
             self.clearPoints()
-        elif movement == 3 and self.plansza != self.nextDown:
+        elif movement == 1 and self.plansza != self.nextDown:
             self.plansza = self.nextDown
             points = self.downPoints
             self.clearPoints()

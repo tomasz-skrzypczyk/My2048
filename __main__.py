@@ -1,9 +1,10 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import *
 
+from model.AIThread import aiThread
 from model.gra import Gra
+from model.monoHeurGenerator import MonoHeurGenerator
 from model.monteCarloGenerator import MonteCarloGenerator
-from model.monteThread import monteThread
 from view.viewcontroler import Game2048
 
 
@@ -12,9 +13,10 @@ class GameController:
     def __init__(self, game):
         self.view = None
         self.game = game
-        self.remote_controle = False
+        self.remote_control = False
         self.remote_controller = None
         self.threadpool = QThreadPool()
+        self.worker = None
 
     def setView(self, view):
         self.view = view
@@ -43,18 +45,22 @@ class GameController:
         return self.game.highestTile()
 
     def take_control(self, controller, steps=100):
-        if not self.remote_controle:
-            self.remote_controle = True
-        else:
-            self.remote_controle = False
-        if controller == "monteCarlo":
-            self.remote_controller = "monteCarlo"
-            worker = monteThread(self, steps)
-            self.threadpool.start(worker)
+        self.remote_control = True
+        if controller == "stop":
+            self.remote_control = False
+            if self.worker:
+                self.worker.autoDelete()
+            return
+        self.remote_controller = controller
+        self.worker = aiThread(self, steps)
+        self.threadpool.start(self.worker)
 
     def remote_move(self, steps=100):
-        if self.remote_controle:
-            next_move = MonteCarloGenerator.generateNext(self.game, steps)
+        if self.remote_control:
+            if self.remote_controler == "monteCarlo":
+                next_move = MonteCarloGenerator.generateNext(self.game, steps)
+            if self.remote_controler == "monoHeur":
+                next_move = monoHeurGenerator.generateNext(self.game)
             movements = {1: "down", 3: "right", 2: "left", 0: "up"}
             moved, notOver = self.move(movements.get(next_move))
             if notOver is False:
@@ -68,36 +74,56 @@ class GameController:
 
 
 if __name__ == '__main__':
-    MODE = "REMOTE"
+    MODE = "REMOTE_HEUR"
     size = 4
-    STEPS_NUMBER = 50
+    STEPS_NUMBER = 125
     app = QtWidgets.QApplication([])
     nowaGra = Gra(size)
     gameController = GameController(nowaGra)
-    if MODE != "REMOTE":
+    if MODE == "NOT_REMOTE":
         g = Game2048(None, gameController, 340, size)
         gameController.setView(g)
         g.move(0, 0)
-        g.resize(400, 600)
+        g.resize(600, 600)
         # g.changeGridSize(3)
         g.setWindowTitle('2048 Game')
         g.updateTiles()
         g.show()
         app.exec_()
-    else:
+    elif MODE == "MONTE":
         import csv
 
-        with open('monte_carlo_{}_steps.csv'.format(STEPS_NUMBER), 'w', newline='') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=' ',
-                                    quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            for _ in range(80):
-                gameController.take_control("monteCarlo", steps = STEPS_NUMBER)
-                while gameController.remote_controle:
-                    pass
-                score = gameController.score()
-                print("Score: ", score)
-                print("Highest tile: ", gameController.highestTile())
+        for _ in range(89):
+            gameController.take_control("monteCarlo", steps=STEPS_NUMBER)
+            while gameController.remote_control:
+                pass
+            score = gameController.score()
+            print("Score: ", score)
+            print("Highest tile: ", gameController.highestTile())
+            with open('statistics/data/monte_carlo_{}_steps.csv'.format(STEPS_NUMBER), 'a', newline='') as csvfile:
+                spamwriter = csv.writer(csvfile, delimiter=' ',
+                                        quotechar='|', quoting=csv.QUOTE_MINIMAL)
                 spamwriter.writerow([gameController.highestTile()])
-                gameController.reset_game()
+            gameController.reset_game()
+    elif MODE == "REMOTE_HEUR":
+        import csv
 
-
+        for _ in range(100):
+            while gameController.game.notOver():
+                next_move = MonoHeurGenerator.generateNext(gameController)
+                movements = {1: "down", 3: "right", 2: "left", 0: "up"}
+                moved, notOver = gameController.move(movements.get(next_move))
+                if moved:
+                    print(movements.get(next_move))
+                    score = gameController.score()
+                    print("Score: ", score)
+                if not notOver:
+                    break
+            score = gameController.score()
+            print("Score: ", score)
+            print("Highest tile: ", gameController.highestTile())
+            with open('statistics/data/monte_heur_corner.csv', 'a', newline='') as csvfile:
+                spamwriter = csv.writer(csvfile, delimiter=' ',
+                                        quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                spamwriter.writerow([gameController.highestTile()])
+            gameController.reset_game()

@@ -1,35 +1,38 @@
-import copy
-import random
+from typing import List
 
 import numpy as np
 
-class MonteCarloGenerator:
+
+class MonoHeurGenerator:
 
     @staticmethod
-    def generateNext(gra, size):
+    def generateNext(gameController, type="corner", exponential_parameter=2, weights=None):
+        def monoheuristic(table, weights_table):
+            table_aux = [[int(2 ** (j)) for j in i] for i in table]
+            if table == gameController.game.table:
+                return 0
+            return sum(sum([a * b for (a, b) in zip(i, j)]) for (i, j) in zip(table_aux, weights_table))
 
-        def getScore(gra):
+        movesScore: List[int] = [0, 0, 0, 0]
+        gameController.game.table.hasNext()
+        TODO: "opisy"
 
-            simulation = copy.deepcopy(gra)
-            first = random.randint(0,3)
-            if simulation.notOver():
-                moved = simulation.move(first)
-            else:
-                raise ValueError("Nie ma ruchu")
-            if moved:
-                while simulation.notOver():
-                    simulation.move(random.randint(0, 3))
-                return simulation.score, first
-            else:
-                return 0, first
+        # wygeneruj wszystkie tablice:
+        if type == "corner" or type != "corner":
+            weights_tables = []
+            aux = [[exponential_parameter ** (i + j) for i in range(gameController.game.size)] for j in
+                   range(gameController.game.size)]
+            weights_tables.append(aux)
+            weights_tables.append([l.reverse() for l in aux])
+            weights_tables.append(aux.reverse())
+            weights_tables.append([l.reverse() for l in aux])
 
+        # dla kazdej kombinacji:
+        for weights_table in weights_tables:
+            movesScore[0] = max(monoheuristic(gameController.game.table.nextUp, weights_table), movesScore[0])
+            movesScore[1] = max(monoheuristic(gameController.game.table.nextDown, weights_table), movesScore[1])
+            movesScore[2] = max(monoheuristic(gameController.game.table.nextLeft, weights_table), movesScore[2])
+            movesScore[3] = max(monoheuristic(gameController.game.table.nextRight, weights_table), movesScore[3])
+            break
 
-        movesScore = [0,0,0,0]
-        movesCount = [0,0,0,0]
-        for i in range(size):
-
-            score, first =  getScore(gra)
-            movesCount[first] += 1
-            movesScore[first] += score
-        movesCount = [1 if x == 0 else x for x in movesCount]
-        return np.argmax([x[0]/x[1] for x in zip(movesScore,  movesCount)])
+        return np.random.choice(np.flatnonzero(movesScore == np.array(movesScore).max()))
