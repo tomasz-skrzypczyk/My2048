@@ -13,7 +13,7 @@ class aiThread(QRunnable):
 
     @pyqtSlot()
     def run(self):
-        while self.gameController.remote_controle and self.gameController.game.notOver():
+        while self.gameController.remote_control and self.gameController.game.notOver():
             self.gameController.remote_move(self.steps)
-        self.gameController.remote_controle = False
+        self.gameController.remote_control = False
         self.gameController.gameOver()

@@ -3,12 +3,15 @@ import random
 
 import numpy as np
 
+from model.gra import Gra
+
+
 class MonteCarloGenerator:
 
     @staticmethod
-    def generateNext(gra, size):
+    def generateNext(gra: Gra, steps):
 
-        def getScore(gra):
+        def getScore(gra: Gra):
 
             simulation = copy.deepcopy(gra)
             first = random.randint(0,3)
@@ -26,9 +29,8 @@ class MonteCarloGenerator:
 
         movesScore = [0,0,0,0]
         movesCount = [0,0,0,0]
-        for i in range(size):
-
-            score, first =  getScore(gra)
+        for _ in range(steps):
+            score, first = getScore(gra)
             movesCount[first] += 1
             movesScore[first] += score
         movesCount = [1 if x == 0 else x for x in movesCount]

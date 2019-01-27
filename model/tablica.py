@@ -68,10 +68,10 @@ class Tablica:
         self.downPoints = 0
 
     def hasNext(self):
-        self.nextLeft = [self.left(x) for x in self.plansza]
-        self.nextRight = [self.right(x) for x in self.plansza]
-        self.nextUp = np.array([self.left(x, "up") for x in np.array(self.plansza).T.tolist()]).T.tolist()
-        self.nextDown = np.array([self.right(x, "down") for x in np.array(self.plansza).T.tolist()]).T.tolist()
+        self.nextLeft = np.array([self.right(x, "down") for x in np.array(self.plansza).T.tolist()]).T.tolist()
+        self.nextRight = np.array([self.left(x, "up") for x in np.array(self.plansza).T.tolist()]).T.tolist()
+        self.nextUp = [self.right(x) for x in self.plansza]
+        self.nextDown = [self.left(x) for x in self.plansza]
 
         if any([self.plansza != possible_move for possible_move in
                 [self.nextLeft, self.nextRight, self.nextUp, self.nextDown]]):
@@ -80,23 +80,6 @@ class Tablica:
         return False
 
     def left(self, x, direction="left"):
-        result = [number for number in x if number != -1]
-        while len(result) != len(x):
-            result.append(-1)
-        # print(result)
-        for i in range(len(x) - 1):
-            if result[i] == result[i + 1] and result[i] != -1:
-                result[i] += 1
-                if direction == "up":
-                    self.upPoints += pow(2, result[i])
-                else:
-                    self.leftPoints += pow(2, result[i])
-                for j in range(i + 1, len(x) - 1):
-                    result[j] = result[j + 1]
-                result[-1] = -1
-        return result
-
-    def right(self, x, direction="right"):
         result = [number for number in x if number != -1]
         while len(result) != len(x):
             result.insert(0, -1)
@@ -111,6 +94,24 @@ class Tablica:
                 for j in range(1, i + 1)[::-1]:
                     result[j] = result[j - 1]
                 result[0] = -1
+        return result
+
+    def right(self, x, direction="right"):
+        result = [number for number in x if number != -1]
+        while len(result) != len(x):
+            result.append(-1)
+        # print(result)
+        for i in range(len(x) - 1):
+            if result[i] == result[i + 1] and result[i] != -1:
+                result[i] += 1
+                if direction == "up":
+                    self.upPoints += pow(2, result[i])
+                else:
+                    self.leftPoints += pow(2, result[i])
+                for j in range(i + 1, len(x) - 1):
+                    result[j] = result[j + 1]
+                result[-1] = -1
+
         return result
 
     @staticmethod

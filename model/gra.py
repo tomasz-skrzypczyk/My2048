@@ -2,7 +2,7 @@ from model.tablica import Tablica
 
 
 class Gra:
-    def __init__(self, size=4, seed=None, tablica=None):
+    def __init__(self, size=4, seed=None, tablica: Tablica = None):
         self.size = size
         self.seed = seed
         if tablica is None:
@@ -11,6 +11,9 @@ class Gra:
             self.table = tablica
         self.moves = 0
         self.score = 0
+        self.search_depth = 0
+        self.next_move = None
+        self.next_move_value = 0
 
     def initialise(self):
         if self.seed:
@@ -22,10 +25,18 @@ class Gra:
         self.table.print()
         print()
 
+    def setNextMove(self, k):
+        self.next_move = k
+        return self
+
+    def increment_depth(self):
+        self.search_depth = self.search_depth + 1
+        return self
+
     def highestTile(self):
         return self.table.highestTile()
 
-    def move(self, movement):
+    def move(self, movement: int):
         moved, points = self.table.move(movement)
         self.score += points
         # print("Ruch wykonano")
@@ -39,6 +50,16 @@ class Gra:
             self.moves += 1
         return moved
 
+    def can_move(self, move):
+        self.table.hasNext()
+        if move == 0:
+            return self.table.plansza != self.table.nextUp
+        if move == 1:
+            return self.table.plansza != self.table.nextDown
+        if move == 2:
+            return self.table.plansza != self.table.nextLeft
+        if move == 3:
+            return self.table.plansza != self.table.nextRight
 
     def notOver(self):
         return self.table.hasNext()
