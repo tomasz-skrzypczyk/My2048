@@ -16,4 +16,6 @@ class aiThread(QRunnable):
         while self.gameController.remote_control and self.gameController.game.notOver():
             self.gameController.remote_move(self.steps)
         self.gameController.remote_control = False
-        self.gameController.gameOver()
+        self.gameController.remoteOff()
+        # if not self.gameController.game.notOver():
+        #     self.gameController.gameOver()

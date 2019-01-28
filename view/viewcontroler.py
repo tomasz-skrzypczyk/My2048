@@ -160,6 +160,10 @@ class Game2048(QtWidgets.QWidget):
             else:
                 self.gameController.take_control("stop")
 
+    def remoteOff(self):
+        self.monoHeurRemote = False
+        self.monteCarloRemote = False
+
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
         painter.setPen(QtCore.Qt.NoPen)

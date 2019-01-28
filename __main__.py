@@ -12,7 +12,7 @@ class GameController:
 
     def __init__(self, game):
         self.view = None
-        self.game = game
+        self.game: Gra = game
         self.remote_control = False
         self.remote_controller = None
         self.threadpool = QThreadPool()
@@ -47,6 +47,8 @@ class GameController:
         return self.game.highestTile()
 
     def take_control(self, controller, steps=100):
+        if not self.game.notOver():
+            return
         self.remote_control = True
         if controller == "stop":
             self.remote_control = False
@@ -56,6 +58,9 @@ class GameController:
         self.remote_controler = controller
         self.worker = aiThread(self, steps)
         self.threadpool.start(self.worker)
+
+    def remoteOff(self):
+        self.view.remoteOff()
 
     def remote_move(self, steps=100):
         if self.remote_control:
