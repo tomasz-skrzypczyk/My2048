@@ -3,58 +3,58 @@ import random
 import numpy as np
 
 
-class Tablica:
+class Board:
     def __init__(self, size):
         self.size = size
-        self.plansza = [[-1 for _ in range(self.size)] for _ in range(self.size)]
+        self.values = [[-1 for _ in range(self.size)] for _ in range(self.size)]
         self.generate()
         self.generate()
-        self.nextLeft = self.plansza
-        self.nextRight = self.plansza
-        self.nextUp = self.plansza
-        self.nextDown = self.plansza
+        self.nextLeft = self.values
+        self.nextRight = self.values
+        self.nextUp = self.values
+        self.nextDown = self.values
         self.leftPoints = 0
         self.rightPoints = 0
         self.upPoints = 0
         self.downPoints = 0
 
     def toList(self):
-        return [item for sublist in self.plansza for item in sublist]
+        return [item for sublist in self.values for item in sublist]
 
     def generate(self):
         rand = random.randint(0, 15)
-        while self.plansza[int(rand / self.size)][rand % self.size] != -1:
+        while self.values[int(rand / self.size)][rand % self.size] != -1:
             rand = random.randint(0, self.size * self.size - 1)
-        self.plansza[int(rand / self.size)][rand % self.size] = 1 if random.randint(0, 9) != 0 else 2
+        self.values[int(rand / self.size)][rand % self.size] = 1 if random.randint(0, 9) != 0 else 2
 
     def isNotFull(self):
-        return any([any([x == -1 for x in el]) for el in self.plansza])
+        return any([any([x == -1 for x in el]) for el in self.values])
 
     def highestTile(self):
-        return 2 ** np.amax(self.plansza)
+        return 2 ** np.amax(self.values)
     def print(self):
-        for el in self.plansza:
+        for el in self.values:
             print([int(pow(2, x)) for x in el])
 
     def move(self, movement):
         moved = True
         points = 0
-        if movement == 2 and self.plansza != self.nextLeft:
-            self.plansza = self.nextLeft
+        if movement == 2 and self.values != self.nextLeft:
+            self.values = self.nextLeft
             points = self.leftPoints
             self.clearPoints()
             # print("lewo")
-        elif movement == 3 and self.plansza != self.nextRight:
+        elif movement == 3 and self.values != self.nextRight:
             # print("Prawo")
-            self.plansza = self.nextRight
+            self.values = self.nextRight
             points = self.rightPoints
             self.clearPoints()
-        elif movement == 0 and self.plansza != self.nextUp:
-            self.plansza = self.nextUp
+        elif movement == 0 and self.values != self.nextUp:
+            self.values = self.nextUp
             points = self.upPoints
             self.clearPoints()
-        elif movement == 1 and self.plansza != self.nextDown:
-            self.plansza = self.nextDown
+        elif movement == 1 and self.values != self.nextDown:
+            self.values = self.nextDown
             points = self.downPoints
             self.clearPoints()
         else:
@@ -68,12 +68,12 @@ class Tablica:
         self.downPoints = 0
 
     def hasNext(self):
-        self.nextLeft = np.array([self.right(x, "down") for x in np.array(self.plansza).T.tolist()]).T.tolist()
-        self.nextRight = np.array([self.left(x, "up") for x in np.array(self.plansza).T.tolist()]).T.tolist()
-        self.nextUp = [self.right(x) for x in self.plansza]
-        self.nextDown = [self.left(x) for x in self.plansza]
+        self.nextLeft = np.array([self.right(x, "down") for x in np.array(self.values).T.tolist()]).T.tolist()
+        self.nextRight = np.array([self.left(x, "up") for x in np.array(self.values).T.tolist()]).T.tolist()
+        self.nextUp = [self.right(x) for x in self.values]
+        self.nextDown = [self.left(x) for x in self.values]
 
-        if any([self.plansza != possible_move for possible_move in
+        if any([self.values != possible_move for possible_move in
                 [self.nextLeft, self.nextRight, self.nextUp, self.nextDown]]):
             return True
 

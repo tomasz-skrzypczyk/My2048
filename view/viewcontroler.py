@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QLineEdit
 
 from view.tile import Tile
+from view.view_utils import *
 
 
 class Game2048(QtWidgets.QWidget):
@@ -13,31 +14,31 @@ class Game2048(QtWidgets.QWidget):
         self.gameRunning = False
         self.GameOver = False
         self.panelHeight = 80
-        self.backgroundBrush = QtGui.QBrush(QtGui.QColor(0xbbada0))
+        self.backgroundBrush = QtGui.QBrush(Color.Silk)
         self.gridSize = gridSize
         self.tileMargin = 16
         self.gridOffsetX = self.tileMargin
         self.gridOffsetY = self.panelHeight + self.tileMargin
         self.brushes = {
-            0: QtGui.QBrush(QtGui.QColor(0xcdc1b4)),
-            1: QtGui.QBrush(QtGui.QColor(0x999999)),
-            2: QtGui.QBrush(QtGui.QColor(0xeee4da)),
-            4: QtGui.QBrush(QtGui.QColor(0xede0c8)),
-            8: QtGui.QBrush(QtGui.QColor(0xf2b179)),
-            16: QtGui.QBrush(QtGui.QColor(0xf59563)),
-            32: QtGui.QBrush(QtGui.QColor(0xf67c5f)),
-            64: QtGui.QBrush(QtGui.QColor(0xf65e3b)),
-            128: QtGui.QBrush(QtGui.QColor(0xedcf72)),
-            256: QtGui.QBrush(QtGui.QColor(0xedcc61)),
-            512: QtGui.QBrush(QtGui.QColor(0xedc850)),
-            1024: QtGui.QBrush(QtGui.QColor(0xedc53f)),
-            2048: QtGui.QBrush(QtGui.QColor(0xedc22e)),
-            4096: QtGui.QBrush(QtGui.QColor(0xedffff)),
-            8192: QtGui.QBrush(QtGui.QColor(0xedffff)),
+            0: QtGui.QBrush(Color.Stark_White),
+            1: QtGui.QBrush(Color.Nobel),
+            2: QtGui.QBrush(Color.Spring_Wood),
+            4: QtGui.QBrush(Color.Pearl_Lusta),
+            8: QtGui.QBrush(Color.Tacao),
+            16: QtGui.QBrush(Color.Atomic_Tangerine),
+            32: QtGui.QBrush(Color.Bittersweet),
+            64: QtGui.QBrush(Color.Outrageous_Orange),
+            128: QtGui.QBrush(Color.Golden_Sand),
+            256: QtGui.QBrush(Color.Golden_Sand_2),
+            512: QtGui.QBrush(Color.Festival),
+            1024: QtGui.QBrush(Color.Festival_2),
+            2048: QtGui.QBrush(Color.Bright_Sun),
+            4096: QtGui.QBrush(Color.Azure),
+            8192: QtGui.QBrush(Color.Azure),
         }
-        self.lightPen = QtGui.QPen(QtGui.QColor(0xf9f6f2))
-        self.darkPen = QtGui.QPen(QtGui.QColor(0x776e65))
-        self.redPen = QtGui.QPen(QtGui.QColor(0x771010))
+        self.lightPen = QtGui.QPen(Color.Floral_White)
+        self.darkPen = QtGui.QPen(Color.Sandstone)
+        self.redPen = QtGui.QPen(Color.Falu_Red)
         self.scoreRect = QtCore.QRect(10, 10, 80, self.panelHeight - 20)
         self.hiScoreRect = QtCore.QRect(100, 10, 80, self.panelHeight - 20)
         self.resetRect = QtCore.QRectF(190, 10, 80, self.panelHeight - 20)

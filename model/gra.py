@@ -1,8 +1,8 @@
-from model.tablica import Tablica
+from model.board import Board
 
 
 class Gra:
-    def __init__(self, size=4, seed=None, tablica: Tablica = None):
+    def __init__(self, size=4, seed=None, tablica: Board = None):
         self.size = size
         self.seed = seed
         if tablica is None:
@@ -17,9 +17,9 @@ class Gra:
 
     def initialise(self):
         if self.seed:
-            return Tablica(self.size)
+            return Board(self.size)
         else:
-            return Tablica(self.size)
+            return Board(self.size)
 
     def print(self):
         self.table.print()
@@ -53,13 +53,13 @@ class Gra:
     def can_move(self, move):
         self.table.hasNext()
         if move == 0:
-            return self.table.plansza != self.table.nextUp
+            return self.table.values != self.table.nextUp
         if move == 1:
-            return self.table.plansza != self.table.nextDown
+            return self.table.values != self.table.nextDown
         if move == 2:
-            return self.table.plansza != self.table.nextLeft
+            return self.table.values != self.table.nextLeft
         if move == 3:
-            return self.table.plansza != self.table.nextRight
+            return self.table.values != self.table.nextRight
 
     def notOver(self):
         return self.table.hasNext()
